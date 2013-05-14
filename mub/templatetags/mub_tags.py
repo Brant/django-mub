@@ -4,7 +4,7 @@ Template Tags for mub
 from django import template
 from django.template.loader import render_to_string
 
-from mub.util import StaticCompiler
+from mub.compilers import StaticCompiler
 
 
 register = template.Library()
