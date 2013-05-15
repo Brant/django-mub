@@ -19,3 +19,6 @@ settings.py
 .pydevproject
 env/
 _tmp.png
+css/cache
+mub_tests/static/js/cache
+mub_tests/static/css/cache

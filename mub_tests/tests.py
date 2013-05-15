@@ -46,3 +46,21 @@ class FullRequestTestCase(TestCase):
         resp = self.client.get("/js/")
         self.assertIn("/static/js/script.js", str(resp))
         self.assertNotIn("/static/css/", str(resp))
+    
+    @override_settings(DEBUG=True, MUB_MINIFY=True)
+    def test_js_minify_debug_true(self):
+        resp = self.client.get("/js/")
+        self.assertNotIn("/static/js/script.js", str(resp))
+        self.assertNotIn("/static/css/", str(resp))
+        
+    @override_settings(DEBUG=True, MUB_MINIFY=True)
+    def test_css_minify_debug_true(self):
+        resp = self.client.get("/css/")
+        self.assertNotIn("/static/css/style.css", str(resp))
+        self.assertNotIn("/static/js/", str(resp))
+    
+    @override_settings(DEBUG=True, MUB_MINIFY=True)
+    def test_minify_debug_true(self):
+        resp = self.client.get("/")
+        self.assertNotIn("/static/css/style.css", str(resp))
+        self.assertNotIn("/static/js/script.js", str(resp))
