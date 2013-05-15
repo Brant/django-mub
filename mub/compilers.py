@@ -2,6 +2,7 @@
 Static file list compilers
 """
 import os
+import shutil
 
 from django.contrib.staticfiles.finders import FileSystemFinder
 from django.conf import settings
@@ -25,7 +26,8 @@ class StaticCompiler(object):
         self._filename = None
         self._timestamp = None
         self._location = None
-        self._cache_location = None    
+        self.cache_location = None
+        self._compile_file_list()
     
     def _compile_file_list_from_staticfiles_dirs(self):
         """
@@ -67,7 +69,18 @@ class StaticCompiler(object):
                 final_dict.update({u"%s" % item: (u"%s/%s" % (path, item), rootdir)})
         self._items = final_dict
 
-    def compile_file_list(self):
+    def clean_up(self):
+        if self.cache_location and os.path.isdir(self.cache_location):
+            shutil.rmtree(self.cache_location)
+    
+    def get_staticfiles_list(self):
+        """
+        Return list of static files to serve
+        """
+        self._massage_ordered_list()
+        return [item[0] for item in self._ordered_items]
+    
+    def _compile_file_list(self):
         """
         Return the list of files to feed to the template
         """
@@ -84,12 +97,9 @@ class StaticCompiler(object):
             cache_location[len(cache_location)-1] = "cache"
       
             self._cache_path = "/".join(cache_location) + "/"
-            self._cache_location = os.path.join(self._location, self._cache_path)
+            self.cache_location = os.path.join(self._location, self._cache_path)
       
             self.order_file_list()
-            self._massage_ordered_list()
-    
-            return [item[0] for item in self._ordered_items]
 
     def order_file_list(self):
         """
@@ -129,13 +139,13 @@ class StaticCompiler(object):
         self._timestamp = latest_timestamp([os.path.join(location, path) for path, location in self._ordered_items])
         self._establish_filename()
 
-        cachefile = os.path.join(self._cache_location, self._filename)
+        cachefile = os.path.join(self.cache_location, self._filename)
 
         if not os.path.isfile(cachefile):
             minifier = MUBMinifier()
             minifier(self._ext, self._ordered_items, cachefile)
 
-        self._ordered_items = [("%s%s" % (self._cache_path, self._filename), self._cache_location)]
+        self._ordered_items = [("%s%s" % (self._cache_path, self._filename), self.cache_location)]
 
     def _establish_filename(self):
         """

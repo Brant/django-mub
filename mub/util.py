@@ -5,7 +5,7 @@ import os
 import re
 
 
-def massage_css_images_for_minify(css_contents, css_url):
+def massage_css_images_for_cache_path(css_contents, css_url):
     """
     When we cache the CSS, it changes the structure of where the images sit, 
         relative to the cache'd sheet

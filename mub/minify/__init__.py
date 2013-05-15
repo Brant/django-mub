@@ -9,7 +9,7 @@ from django.conf import settings
 
 from .css_min import cssmin
 from .js_min import jsmin
-from mub.util import massage_css_images_for_minify
+from mub.util import massage_css_images_for_cache_path
 
 class MUBMinifier:
     
@@ -33,7 +33,7 @@ class MUBMinifier:
         """
         """
         css_url = settings.STATIC_URL + os.sep.join(self._filelist[0][0].split(os.sep)[:-1]) 
-        self._str = cssmin(massage_css_images_for_minify(self._str, css_url))
+        self._str = cssmin(massage_css_images_for_cache_path(self._str, css_url))
         
     def mini_js(self):
         """

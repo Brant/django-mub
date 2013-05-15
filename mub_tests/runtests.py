@@ -36,6 +36,7 @@ if not settings.configured:
         INSTALLED_APPS = MY_INSTALLED_APPS,
         SITE_ID = 1,
         STATIC_URL = '/static/',
+        STATIC_ROOT = PROJECT_PATH + "/collectstatic",
         ROOT_URLCONF = 'mub_tests.urls',
         NOSE_ARGS = [
             "--with-xcoverage", 

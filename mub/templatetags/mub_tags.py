@@ -17,5 +17,5 @@ def add_static(ext):
     """
     ext = ext.lower()
     compiler = StaticCompiler(ext)
-    file_list = compiler.compile_file_list()
+    file_list = compiler.get_staticfiles_list()
     return render_to_string("mub/context_%s.html" % ext, {"items": file_list})
