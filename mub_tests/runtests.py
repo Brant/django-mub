@@ -5,10 +5,12 @@ import imp
 
 from django.conf import settings
 
+PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 MY_INSTALLED_APPS = [
     'mub',
     'mub_tests',
+    'django.contrib.staticfiles',
 ]
 
 
@@ -26,6 +28,11 @@ if not settings.configured:
                 'ENGINE': 'django.db.backends.sqlite3',
             }
         },
+        PROJECT_PATH = PROJECT_PATH,
+        STATICFILES_DIRS = (PROJECT_PATH + "/static", ),
+        STATICFILES_FINDERS = (
+            'django.contrib.staticfiles.finders.FileSystemFinder',
+        ),
         INSTALLED_APPS = MY_INSTALLED_APPS,
         SITE_ID = 1,
         STATIC_URL = '/static/',

@@ -6,14 +6,43 @@ import os
 
 from django.test import TestCase
 from django.conf import settings
+from django.test.utils import override_settings
+from django.test.client import Client
 
 
-class SanityCheckTestCase(TestCase):
+class FullRequestTestCase(TestCase):
     """
-    Test case to check sanity of test suite
+    Tests relating to the full http request
     """
-    def test_addition(self):
+    def setUp(self):
         """
-        Does 1 + 1 still equal 2?
+        Set a few things up for each test
         """
-        self.assertEquals(1+1, 2)
+        self.client = Client()
+
+    @override_settings(DEBUG=True)
+    def test_debug_true(self):
+        """
+        Test spitting out both JS and CSS
+        """
+        resp = self.client.get("/")
+        self.assertIn("/static/js/script.js", str(resp))
+        self.assertIn("/static/css/style.css", str(resp))
+
+    @override_settings(DEBUG=True)
+    def test_css_debug_true(self):
+        """
+        Test spitting out css only
+        """
+        resp = self.client.get("/css/")
+        self.assertIn("/static/css/style.css", str(resp))
+        self.assertNotIn("/static/js/", str(resp))
+
+    @override_settings(DEBUG=True)
+    def test_js_debug_true(self):
+        """
+        Test spitting out JS only
+        """
+        resp = self.client.get("/js/")
+        self.assertIn("/static/js/script.js", str(resp))
+        self.assertNotIn("/static/css/", str(resp))
