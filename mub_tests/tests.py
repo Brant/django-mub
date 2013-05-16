@@ -260,7 +260,7 @@ class CSSOrderingTestCase(CleanableCache):
         self.assertTrue(str(resp).index("style.css") < str(resp).index("style-3.css"))
         self.assertTrue(str(resp).index("style-2.css") < str(resp).index("style-3.css"))
     
-    @override_settings(DEBUG=True, MUB_CSS_ORDER=(("style-2.css", "style.css"), ("style-3.css")))
+    @override_settings(DEBUG=True, MUB_CSS_ORDER=(("style-2.css", "style.css"), ("style-3.css", )))
     def test_css_ordering_3(self):
         resp = self.client.get("/css/")
         self.assertIn("/static/css/style.css", str(resp))
@@ -268,7 +268,7 @@ class CSSOrderingTestCase(CleanableCache):
         self.assertTrue(str(resp).index("style.css") < str(resp).index("style-3.css"))
         self.assertTrue(str(resp).index("style-2.css") < str(resp).index("style-3.css"))  
     
-    @override_settings(DEBUG=True, MUB_CSS_ORDER=(("style-2.css", "style.css"), ("style-3.css")))
+    @override_settings(DEBUG=True, MUB_CSS_ORDER=(("style-2.css", "style.css"), ("style-3.css", )))
     def test_css_ordering_4(self):
         resp = self.client.get("/css/")
         self.assertIn("/static/css/style.css", str(resp))
@@ -276,7 +276,7 @@ class CSSOrderingTestCase(CleanableCache):
         self.assertTrue(str(resp).index("style.css") < str(resp).index("style-3.css"))
         self.assertTrue(str(resp).index("style-2.css") < str(resp).index("style-3.css"))
 
-    @override_settings(DEBUG=True, MUB_CSS_ORDER=(("style-3.css", "style.css"), ("style-2.css")))
+    @override_settings(DEBUG=True, MUB_CSS_ORDER=(("style-3.css", "style.css"), ("style-2.css", )))
     def test_css_ordering_5(self):
         resp = self.client.get("/css/")
         self.assertIn("/static/css/style.css", str(resp))
@@ -284,7 +284,7 @@ class CSSOrderingTestCase(CleanableCache):
         self.assertTrue(str(resp).index("style.css") < str(resp).index("style-2.css"))
         self.assertTrue(str(resp).index("style-3.css") < str(resp).index("style-2.css"))
     
-    @override_settings(DEBUG=True, MUB_CSS_ORDER=((), ("style-2.css")))
+    @override_settings(DEBUG=True, MUB_CSS_ORDER=((), ("style-2.css", )))
     def test_css_ordering_6(self):
         resp = self.client.get("/css/")
         self.assertIn("/static/css/style.css", str(resp))
