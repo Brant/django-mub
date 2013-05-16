@@ -2,21 +2,21 @@
 
 """
 import os
-
+import shutil
 
 from django.test import TestCase
 from django.conf import settings
 from django.test.utils import override_settings
 from django.test.client import Client
+from django.core.management import call_command
 
 from mub.compilers import StaticCompiler
 
 
-class FullRequestDebugTrueTestCase(TestCase):
+class CleanableCache(TestCase):
     """
-    Tests relating to the full http request
+    Standardize setup/teardown across tests
     """
-    @override_settings(DEBUG=True)
     def setUp(self):
         """
         Set a few things up for each test
@@ -27,8 +27,14 @@ class FullRequestDebugTrueTestCase(TestCase):
         self.css_compiler.clean_up()
         self.js_compiler.clean_up()
         self._assert_clean()
-        self.assertNotIn(self.css_compiler.cache_location, settings.STATIC_ROOT)
-        self.assertNotIn(self.js_compiler.cache_location, settings.STATIC_ROOT)
+    
+    def tearDown(self):
+        """
+        Clean things up after each test
+        """
+        self.css_compiler.clean_up()
+        self.js_compiler.clean_up()
+        self._assert_clean()
     
     def _assert_clean(self):
         """
@@ -36,6 +42,7 @@ class FullRequestDebugTrueTestCase(TestCase):
         """
         self.assertFalse(os.path.isdir(self.css_compiler.cache_location))
         self.assertFalse(os.path.isdir(self.js_compiler.cache_location))
+        
     
     def _assert_cache_exists(self, ext):
         """
@@ -44,16 +51,102 @@ class FullRequestDebugTrueTestCase(TestCase):
         compiler = getattr(self, "%s_compiler" % ext)
         self.assertTrue(os.path.isdir(compiler.cache_location))
     
+    def remove_static_root(self):
+        """
+        Clear collectstatic location
+        """
+        if os.path.isdir(settings.STATIC_ROOT):
+            shutil.rmtree(settings.STATIC_ROOT)
+
+
+class FullRequestDebugFalseTestCase(CleanableCache):
+    """
+    Tests relating to the full http request
+    while DEBUG is False
+    """
+    @override_settings(DEBUG=False)
+    def setUp(self):
+        """
+        Some setup before each test
+        """
+        if os.path.isdir(settings.STATIC_ROOT):
+            shutil.rmtree(settings.STATIC_ROOT)
+        self.assertFalse(os.path.isdir(settings.STATIC_ROOT))
+        call_command("collectstatic", interactive=False)
+        self.assertTrue(os.path.isdir(settings.STATIC_ROOT))
+        super(FullRequestDebugFalseTestCase, self).setUp()
+        self.assertIn(settings.STATIC_ROOT, self.css_compiler.cache_location)
+        self.assertIn(settings.STATIC_ROOT, self.js_compiler.cache_location)
+    
+    def tearDown(self):
+        """
+        Remove cache dirs and STATIC_ROOT
+        """
+        super(FullRequestDebugFalseTestCase, self).tearDown()
+        shutil.rmtree(settings.STATIC_ROOT)
+        self.assertFalse(os.path.isdir(settings.STATIC_ROOT))
+    
+    def test_css_minify(self):
+        """
+        Test spitting out css only
+        """
+        resp = self.client.get("/css/")
+        self.assertNotIn("/static/css/style.css", str(resp))
+        self.assertNotIn("/static/js/", str(resp))
+        self.assertIn("/static/css/cache", str(resp))
+        self.assertNotIn("/static/js/cache", str(resp))
+        self._assert_cache_exists("css")
+        
+    def test_js_minify(self):
+        """
+        Test spitting out js only
+        """
+        resp = self.client.get("/js/")
+        self.assertNotIn("/static/css/", str(resp))
+        self.assertNotIn("/static/js/script.js", str(resp))
+        self.assertIn("/static/js/cache", str(resp))
+        self.assertNotIn("/static/css/cache", str(resp))
+        self._assert_cache_exists("js")
+    
+    def test_minify(self):
+        """
+        Test spitting out css only
+        """
+        resp = self.client.get("/")
+        self.assertNotIn("/static/css/style.css", str(resp))
+        self.assertNotIn("/static/js/script.js", str(resp))
+        self.assertIn("/static/js/cache", str(resp))
+        self.assertIn("/static/css/cache", str(resp))
+        self._assert_cache_exists("css")
+        self._assert_cache_exists("js")
+
+
+class FullRequestDebugTrueTestCase(CleanableCache):
+    """
+    Tests relating to the full http request
+    while DEBUG is True
+    """
+    @override_settings(DEBUG=True)
+    def setUp(self):
+        """
+        Some setup before each test
+        """
+        super(FullRequestDebugTrueTestCase, self).setUp()
+        self.assertNotIn(self.css_compiler.cache_location, settings.STATIC_ROOT)
+        self.assertNotIn(self.js_compiler.cache_location, settings.STATIC_ROOT)
+        self.assertFalse(os.path.isdir(settings.STATIC_ROOT))
+    
     @override_settings(DEBUG=True)
     def tearDown(self):
-        self.css_compiler.clean_up()
-        self.js_compiler.clean_up()
-        self._assert_clean()
+        """
+        clear out stuff we've put places after each test
+        """
+        super(FullRequestDebugTrueTestCase, self).tearDown()
 
     @override_settings(DEBUG=True)
     def test_debug_true(self):
         """
-        Test spitting out both JS and CSS
+        Test spitting out both JS and CSS as individual items
         """
         resp = self.client.get("/")
         self.assertIn("/static/js/script.js", str(resp))
@@ -63,7 +156,7 @@ class FullRequestDebugTrueTestCase(TestCase):
     @override_settings(DEBUG=True)
     def test_css_debug_true(self):
         """
-        Test spitting out css only
+        Test spitting out css only as individual items
         """
         resp = self.client.get("/css/")
         self.assertIn("/static/css/style.css", str(resp))
@@ -73,7 +166,7 @@ class FullRequestDebugTrueTestCase(TestCase):
     @override_settings(DEBUG=True)
     def test_js_debug_true(self):
         """
-        Test spitting out JS only
+        Test spitting out JS only as individual items
         """
         resp = self.client.get("/js/")
         self.assertIn("/static/js/script.js", str(resp))
