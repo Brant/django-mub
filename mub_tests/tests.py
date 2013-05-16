@@ -59,6 +59,18 @@ class CleanableCache(TestCase):
             shutil.rmtree(settings.STATIC_ROOT)
 
 
+class MiscTestCase(CleanableCache):
+    def setUp(self):
+        call_command("collectstatic", interactive=False)
+    
+    def tearDown(self):
+        shutil.rmtree(settings.STATIC_ROOT)
+    
+    @override_settings(STATIC_ROOT=settings.STATIC_ROOT + "/")
+    def test_appended_slash(self):
+        resp = self.client.get("/")    
+    
+
 class FullRequestDebugFalseTestCase(CleanableCache):
     """
     Tests relating to the full http request
@@ -119,6 +131,8 @@ class FullRequestDebugFalseTestCase(CleanableCache):
         self.assertIn("/static/css/cache", str(resp))
         self._assert_cache_exists("css")
         self._assert_cache_exists("js")
+
+
 
 
 class FullRequestDebugTrueTestCase(CleanableCache):
