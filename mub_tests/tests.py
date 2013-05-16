@@ -27,7 +27,7 @@ class CleanableCache(TestCase):
         self.css_compiler.clean_up()
         self.js_compiler.clean_up()
         self._assert_clean()
-    
+
     def tearDown(self):
         """
         Clean things up after each test
@@ -35,22 +35,21 @@ class CleanableCache(TestCase):
         self.css_compiler.clean_up()
         self.js_compiler.clean_up()
         self._assert_clean()
-    
+
     def _assert_clean(self):
         """
         Assert that the cache dirs do not exist
         """
         self.assertFalse(os.path.isdir(self.css_compiler.cache_location))
         self.assertFalse(os.path.isdir(self.js_compiler.cache_location))
-        
-    
+
     def _assert_cache_exists(self, ext):
         """
         Assert that the cache dir exists
         """
         compiler = getattr(self, "%s_compiler" % ext)
         self.assertTrue(os.path.isdir(compiler.cache_location))
-    
+
     def remove_static_root(self):
         """
         Clear collectstatic location
@@ -60,16 +59,32 @@ class CleanableCache(TestCase):
 
 
 class MiscTestCase(CleanableCache):
+    """
+    Just some miscellaneous stuff
+    """
+    @override_settings(STATIC_ROOT=settings.STATIC_ROOT + "/", DEBUG=False)
     def setUp(self):
+        """
+        Collect static
+        """
         call_command("collectstatic", interactive=False)
     
+    @override_settings(STATIC_ROOT=settings.STATIC_ROOT + "/", DEBUG=False)
     def tearDown(self):
+        """
+        Remove static root
+        """
         shutil.rmtree(settings.STATIC_ROOT)
     
-    @override_settings(STATIC_ROOT=settings.STATIC_ROOT + "/")
+    @override_settings(STATIC_ROOT=settings.STATIC_ROOT + "/", DEBUG=False)
     def test_appended_slash(self):
-        resp = self.client.get("/")    
-    
+        """
+        Make sure we are all good if static root has an appending slash
+        
+        This is really just a code coverage thing
+        """
+        resp = self.client.get("/")
+
 
 class FullRequestDebugFalseTestCase(CleanableCache):
     """
@@ -134,7 +149,6 @@ class FullRequestDebugFalseTestCase(CleanableCache):
 
 
 
-
 class FullRequestDebugTrueTestCase(CleanableCache):
     """
     Tests relating to the full http request
@@ -167,6 +181,8 @@ class FullRequestDebugTrueTestCase(CleanableCache):
         self.assertIn("/static/css/style.css", str(resp))
         self._assert_clean()
 
+      
+    
     @override_settings(DEBUG=True)
     def test_css_debug_true(self):
         """
@@ -208,3 +224,72 @@ class FullRequestDebugTrueTestCase(CleanableCache):
         self.assertNotIn("/static/js/script.js", str(resp))
         self._assert_cache_exists("js")
         self._assert_cache_exists("css")
+
+
+class CSSOrderingTestCase(CleanableCache):
+    """
+    Test cases relating to properly ordering css files
+    """
+    @override_settings(DEBUG=True)
+    def setUp(self):
+        """
+        Some setup before each test
+        """
+        super(CSSOrderingTestCase, self).setUp()
+        
+    @override_settings(DEBUG=True)
+    def tearDown(self):
+        """
+        clear out stuff we've put places after each test
+        """
+        super(CSSOrderingTestCase, self).tearDown()
+        
+    @override_settings(DEBUG=True, MUB_CSS_ORDER=(("style.css", "style-2.css"), ()))
+    def test_css_ordering_1(self):
+        resp = self.client.get("/css/")
+        self.assertIn("/static/css/style.css", str(resp))
+        self.assertTrue(str(resp).index("style.css") < str(resp).index("style-2.css"))
+        self.assertTrue(str(resp).index("style.css") < str(resp).index("style-3.css"))
+        self.assertTrue(str(resp).index("style-2.css") < str(resp).index("style-3.css"))
+        
+    @override_settings(DEBUG=True, MUB_CSS_ORDER=(("style-2.css", "style.css"), ()))
+    def test_css_ordering_2(self):
+        resp = self.client.get("/css/")
+        self.assertIn("/static/css/style.css", str(resp))
+        self.assertTrue(str(resp).index("style-2.css") < str(resp).index("style.css"))
+        self.assertTrue(str(resp).index("style.css") < str(resp).index("style-3.css"))
+        self.assertTrue(str(resp).index("style-2.css") < str(resp).index("style-3.css"))
+    
+    @override_settings(DEBUG=True, MUB_CSS_ORDER=(("style-2.css", "style.css"), ("style-3.css")))
+    def test_css_ordering_3(self):
+        resp = self.client.get("/css/")
+        self.assertIn("/static/css/style.css", str(resp))
+        self.assertTrue(str(resp).index("style-2.css") < str(resp).index("style.css"))
+        self.assertTrue(str(resp).index("style.css") < str(resp).index("style-3.css"))
+        self.assertTrue(str(resp).index("style-2.css") < str(resp).index("style-3.css"))  
+    
+    @override_settings(DEBUG=True, MUB_CSS_ORDER=(("style-2.css", "style.css"), ("style-3.css")))
+    def test_css_ordering_4(self):
+        resp = self.client.get("/css/")
+        self.assertIn("/static/css/style.css", str(resp))
+        self.assertTrue(str(resp).index("style-2.css") < str(resp).index("style.css"))
+        self.assertTrue(str(resp).index("style.css") < str(resp).index("style-3.css"))
+        self.assertTrue(str(resp).index("style-2.css") < str(resp).index("style-3.css"))
+
+    @override_settings(DEBUG=True, MUB_CSS_ORDER=(("style-3.css", "style.css"), ("style-2.css")))
+    def test_css_ordering_5(self):
+        resp = self.client.get("/css/")
+        self.assertIn("/static/css/style.css", str(resp))
+        self.assertTrue(str(resp).index("style-3.css") < str(resp).index("style.css"))
+        self.assertTrue(str(resp).index("style.css") < str(resp).index("style-2.css"))
+        self.assertTrue(str(resp).index("style-3.css") < str(resp).index("style-2.css"))
+    
+    @override_settings(DEBUG=True, MUB_CSS_ORDER=((), ("style-2.css")))
+    def test_css_ordering_6(self):
+        resp = self.client.get("/css/")
+        self.assertIn("/static/css/style.css", str(resp))
+        self.assertTrue(str(resp).index("style-3.css") < str(resp).index("style-2.css"))
+        self.assertTrue(str(resp).index("style.css") < str(resp).index("style-2.css"))
+    
+    
+    
