@@ -6,6 +6,8 @@ The actual minify scripts are NOT my minifiers
 import os
 
 from django.conf import settings
+from django.template.loader import render_to_string
+from django.utils.encoding import smart_unicode
 
 from .css_min import cssmin
 from .js_min import jsmin
@@ -33,12 +35,13 @@ class MUBMinifier:
         """
         """
         css_url = settings.STATIC_URL + os.sep.join(self._filelist[0][0].split(os.sep)[:-1]) 
-        self._str = cssmin(massage_css_images_for_cache_path(self._str, css_url))
+        self._str = cssmin(massage_css_images_for_cache_path(smart_unicode(self._str), css_url))
         
     def mini_js(self):
         """
-        """
-        self._str = jsmin(self._str)
+        """        
+        self._str = jsmin(render_to_string("mub/js_config.txt", {"STATIC_URL": settings.STATIC_URL}) + smart_unicode(self._str))
+
         
     def save(self):
         save_dir = os.path.dirname(os.path.abspath(self._cachefile))

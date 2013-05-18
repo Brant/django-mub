@@ -1,3 +1,6 @@
 {% load static from staticfiles %}
+{% if not IS_MINIFIED %}
+	{% include "mub/js_config_wrapper.txt" %}
+{% endif %}
 {% for item in items %}<script type="text/javascript" src="{% static item %}"></script>
 {% endfor %}

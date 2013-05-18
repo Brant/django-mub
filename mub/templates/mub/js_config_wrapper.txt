@@ -1,0 +1,3 @@
+<script type="text/javascript">
+	{% include "mub/js_config.txt" %}
+</script>

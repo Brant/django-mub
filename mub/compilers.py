@@ -28,6 +28,7 @@ class StaticCompiler(object):
         self._location = None
         self.cache_location = None
         self._compile_file_list()
+        self.is_minified = False
     
     def _compile_file_list_from_staticfiles_dirs(self):
         """
@@ -131,6 +132,7 @@ class StaticCompiler(object):
         """
         if getattr(settings, "MUB_MINIFY", (not settings.DEBUG)):
             self.minify()
+            self.is_minified = True
 
     def minify(self):
         """
