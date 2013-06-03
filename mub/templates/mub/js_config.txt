@@ -7,10 +7,10 @@ function siteVars(opt){
 			return '{{ STATIC_URL }}';
 			break;
 		case 'img':
-			return siteVars('theme') + 'img/';
+			return siteVars('static') + 'img/';
 			break; 
 		case 'css':
-			return siteVars('theme') + 'css/';
+			return siteVars('static') + 'css/';
 			break;
 		default:
 			return null;
