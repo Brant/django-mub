@@ -22,6 +22,7 @@ class StaticCompiler(object):
         Initialize with the extension (e.g. 'js' or 'css')
         """
         self._ext = ext
+        self._cache_key = "mub_%s" % self._ext
         self._items = {}
         self._ordered_items = []
         self._filename = None
@@ -30,7 +31,7 @@ class StaticCompiler(object):
         self.cache_location = None
         self._compile_file_list()
         self.is_minified = False
-        self._cache_key = "mub_%s" % self._ext
+        
     
     def _compile_file_list_from_staticfiles_dirs(self):
         """
