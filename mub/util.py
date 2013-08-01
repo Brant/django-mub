@@ -36,4 +36,3 @@ def latest_timestamp(files):
         if file_mod > latest_mod:
             latest_mod = file_mod
     return latest_mod
-

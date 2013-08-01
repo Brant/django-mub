@@ -7,6 +7,7 @@ import shutil
 from django.contrib.staticfiles.finders import FileSystemFinder
 from django.conf import settings
 from django.contrib.staticfiles.utils import get_files
+from django.core.cache import cache
 
 from mub.minify import MUBMinifier
 from mub.util import latest_timestamp
@@ -29,6 +30,7 @@ class StaticCompiler(object):
         self.cache_location = None
         self._compile_file_list()
         self.is_minified = False
+        self._cache_key = "mub_%s" % self._ext
     
     def _compile_file_list_from_staticfiles_dirs(self):
         """
@@ -78,6 +80,11 @@ class StaticCompiler(object):
         """
         Return list of static files to serve
         """
+        if not settings.DEBUG:
+            cache_file = cache.get(self._cache_key)
+            if cache_file:
+                return [cache_file]
+        
         self._massage_ordered_list()
         return [item[0] for item in self._ordered_items]
     
@@ -88,17 +95,21 @@ class StaticCompiler(object):
         if settings.DEBUG:
             self._compile_file_list_from_staticfiles_dirs()
         else:
+            # Check cache
+            if cache.get(self._cache_key):
+                return
+            
             self._compile_file_list_from_static_root()
         
         if self._items:
             self._location = self._items.values()[0][1]
-      
+            
             cache_location = self._items.values()[0][0]
             cache_location = cache_location.split("/")
             cache_location[len(cache_location)-1] = "cache"
       
-            self._cache_path = "/".join(cache_location) + "/"
-            self.cache_location = os.path.join(self._location, self._cache_path)
+            self._cache_key_path = "/".join(cache_location) + "/"
+            self.cache_location = os.path.join(self._location, self._cache_key_path)
       
             self.order_file_list()
 
@@ -134,20 +145,23 @@ class StaticCompiler(object):
             self.minify()
             self.is_minified = True
 
-    def minify(self):
+    def minify(self, lock=False):
         """
         Responsible for minifying
         """
         self._timestamp = latest_timestamp([os.path.join(location, path) for path, location in self._ordered_items])
         self._establish_filename()
-
+        
         cachefile = os.path.join(self.cache_location, self._filename)
 
         if not os.path.isfile(cachefile):
             minifier = MUBMinifier()
             minifier(self._ext, self._ordered_items, cachefile)
-
-        self._ordered_items = [("%s%s" % (self._cache_path, self._filename), self.cache_location)]
+        
+        if lock:
+            cache.set(self._cache_key, "%s%s" % (self._cache_key_path, self._filename), None)
+        
+        self._ordered_items = [("%s%s" % (self._cache_key_path, self._filename), self.cache_location)]
 
     def _establish_filename(self):
         """
