@@ -31,8 +31,7 @@ class StaticCompiler(object):
         self.cache_location = None
         self._compile_file_list()
         self.is_minified = False
-        
-    
+
     def _compile_file_list_from_staticfiles_dirs(self):
         """
         Compile list of static files for the given extension
