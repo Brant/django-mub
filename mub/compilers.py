@@ -21,6 +21,7 @@ class StaticCompiler(object):
         """
         Initialize with the extension (e.g. 'js' or 'css')
         """
+        self._file_from_cache = False
         self._ext = ext
         self._cache_key = "mub_%s" % self._ext
         self._items = {}
@@ -81,9 +82,8 @@ class StaticCompiler(object):
         Return list of static files to serve
         """
         if not settings.DEBUG:
-            cache_file = cache.get(self._cache_key)
-            if cache_file:
-                return [cache_file]
+            if self._file_from_cache:
+                return [self._file_from_cache]
         
         self._massage_ordered_list()
         return [item[0] for item in self._ordered_items]
@@ -97,6 +97,7 @@ class StaticCompiler(object):
         else:
             # Check cache
             if cache.get(self._cache_key):
+                self._file_from_cache = cache.get(self._cache_key)
                 return
             
             self._compile_file_list_from_static_root()
