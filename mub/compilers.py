@@ -160,7 +160,7 @@ class StaticCompiler(object):
             minifier(self._ext, self._ordered_items, cachefile)
         
         if lock:
-            cache.set(self._cache_key, "%s%s" % (self._cache_key_path, self._filename), None)
+            cache.set(self._cache_key, "%s%s" % (self._cache_key_path, self._filename), timeout=0)
         
         self._ordered_items = [("%s%s" % (self._cache_key_path, self._filename), self.cache_location)]
 
