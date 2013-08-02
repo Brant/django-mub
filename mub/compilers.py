@@ -143,8 +143,8 @@ class StaticCompiler(object):
         Do some stuff with the ordered list before shipping it out
         """
         if self._ordered_items and getattr(settings, "MUB_MINIFY", (not settings.DEBUG)):
-            self.minify()
             self.is_minified = True
+            self.minify()
 
     def minify(self, lock=False):
         """
