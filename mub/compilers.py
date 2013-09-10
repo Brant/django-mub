@@ -10,7 +10,7 @@ from django.contrib.staticfiles.utils import get_files
 from django.core.cache import cache
 
 from mub.minify import MUBMinifier
-from mub.util import latest_timestamp
+from mub.util import latest_timestamp, get_cache_key
 
 
 class StaticCompiler(object):
@@ -23,7 +23,7 @@ class StaticCompiler(object):
         """
         self._file_from_cache = False
         self._ext = ext
-        self._cache_key = "mub_%s" % self._ext
+        self._cache_key = get_cache_key(self._ext)
         self._items = {}
         self._ordered_items = []
         self._filename = None

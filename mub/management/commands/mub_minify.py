@@ -2,12 +2,12 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.cache import cache
 
 from mub.compilers import StaticCompiler
-
+from mub.util import get_cache_key
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        cache.delete("mub_css")
-        cache.delete("mub_js")
+        cache.delete(get_cache_key("css"))
+        cache.delete(get_cache_key("js"))
         
         css_compiler = StaticCompiler("css")
         css_compiler.minify(lock=True)

@@ -4,6 +4,8 @@ Utility functions for MUB
 import os
 import re
 
+from django.conf import settings
+from django.template.defaultfilters import slugify
 
 def massage_css_images_for_cache_path(css_contents, css_url):
     """
@@ -36,3 +38,7 @@ def latest_timestamp(files):
         if file_mod > latest_mod:
             latest_mod = file_mod
     return latest_mod
+
+
+def get_cache_key(ext):
+    return "mub%s%s" % (slugify(settings.SECRET_KEY), ext)
