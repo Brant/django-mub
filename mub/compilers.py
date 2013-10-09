@@ -33,6 +33,63 @@ class StaticCompiler(object):
         self._compile_file_list()
         self.is_minified = False
 
+    def get_staticfiles_list(self):
+        """
+        Return list of static files to serve
+        """
+        if not settings.DEBUG:
+            if self._file_from_cache:
+                return [self._file_from_cache]
+
+        self._massage_ordered_list()
+        return [item[0] for item in self._ordered_items]
+
+    def minify(self, lock=False):
+        """
+        Responsible for minifying
+        """
+        self._timestamp = latest_timestamp([os.path.join(location, path) for path, location in self._ordered_items])
+        self._establish_filename()
+
+        cachefile = os.path.join(self.cache_location, self._filename)
+
+        if not os.path.isfile(cachefile):
+            minifier = MUBMinifier()
+            minifier(self._ext, self._ordered_items, cachefile)
+
+        if lock:
+            cache.set(self._cache_key, "%s%s" % (self._cache_key_path, self._filename), timeout=0)
+
+        self._ordered_items = [("%s%s" % (self._cache_key_path, self._filename), self.cache_location)]
+
+    def order_file_list(self):
+        """
+        Place the items in an order (if one exists)
+        """
+        params = getattr(settings, "MUB_%s_ORDER" % self._ext.upper(), ((), ()))
+        top_files = params[0]
+        bottom_files = params[1]
+
+        for filename in top_files:
+            if filename in self._items:
+                self._ordered_items.append(self._items[filename])
+                del self._items[filename]
+
+        for_bottom = []
+        for filename in bottom_files:
+            if filename in self._items:
+                for_bottom.append(self._items[filename])
+                del self._items[filename]
+
+        for filename in self._items:
+            self._ordered_items.append(self._items[filename])
+
+        self._ordered_items += for_bottom
+
+    def clean_up(self):
+        if self.cache_location and os.path.isdir(self.cache_location):
+            shutil.rmtree(self.cache_location)
+
     def _compile_file_list_from_staticfiles_dirs(self):
         """
         Compile list of static files for the given extension
@@ -73,21 +130,6 @@ class StaticCompiler(object):
                 final_dict.update({u"%s" % item: (u"%s/%s" % (path, item), rootdir)})
         self._items = final_dict
 
-    def clean_up(self):
-        if self.cache_location and os.path.isdir(self.cache_location):
-            shutil.rmtree(self.cache_location)
-
-    def get_staticfiles_list(self):
-        """
-        Return list of static files to serve
-        """
-        if not settings.DEBUG:
-            if self._file_from_cache:
-                return [self._file_from_cache]
-
-        self._massage_ordered_list()
-        return [item[0] for item in self._ordered_items]
-
     def _compile_file_list(self):
         """
         Return the list of files to feed to the template
@@ -98,6 +140,7 @@ class StaticCompiler(object):
             # Check cache
             if cache.get(self._cache_key):
                 self._file_from_cache = cache.get(self._cache_key)
+                self.is_minified = True
                 return
 
             self._compile_file_list_from_static_root()
@@ -114,30 +157,6 @@ class StaticCompiler(object):
 
             self.order_file_list()
 
-    def order_file_list(self):
-        """
-        Place the items in an order (if one exists)
-        """
-        params = getattr(settings, "MUB_%s_ORDER" % self._ext.upper(), ((), ()))
-        top_files = params[0]
-        bottom_files = params[1]
-
-        for filename in top_files:
-            if filename in self._items:
-                self._ordered_items.append(self._items[filename])
-                del self._items[filename]
-
-        for_bottom = []
-        for filename in bottom_files:
-            if filename in self._items:
-                for_bottom.append(self._items[filename])
-                del self._items[filename]
-
-        for filename in self._items:
-            self._ordered_items.append(self._items[filename])
-
-        self._ordered_items += for_bottom
-
     def _massage_ordered_list(self):
         """
         Do some stuff with the ordered list before shipping it out
@@ -145,24 +164,6 @@ class StaticCompiler(object):
         if self._ordered_items and getattr(settings, "MUB_MINIFY", (not settings.DEBUG)):
             self.is_minified = True
             self.minify()
-
-    def minify(self, lock=False):
-        """
-        Responsible for minifying
-        """
-        self._timestamp = latest_timestamp([os.path.join(location, path) for path, location in self._ordered_items])
-        self._establish_filename()
-
-        cachefile = os.path.join(self.cache_location, self._filename)
-
-        if not os.path.isfile(cachefile):
-            minifier = MUBMinifier()
-            minifier(self._ext, self._ordered_items, cachefile)
-
-        if lock:
-            cache.set(self._cache_key, "%s%s" % (self._cache_key_path, self._filename), timeout=0)
-
-        self._ordered_items = [("%s%s" % (self._cache_key_path, self._filename), self.cache_location)]
 
     def _establish_filename(self):
         """

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "django-mub",
-    version = "0.2.6",
+    version = "0.2.7",
     url = 'http://github.com/Brant/django-mub',
     license = 'GPL',
     description = "Monster Under the Bed - Compresses and Consolidates CSS and JS Files for Django Applications",
