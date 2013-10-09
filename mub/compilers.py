@@ -30,8 +30,8 @@ class StaticCompiler(object):
         self._timestamp = None
         self._location = None
         self.cache_location = None
-        self._compile_file_list()
         self.is_minified = False
+        self._compile_file_list()
 
     def get_staticfiles_list(self):
         """
