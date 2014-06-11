@@ -1,0 +1,16 @@
+# Site settings
+title: Monster Under the Bed
+email: brant.steen@gmail.com
+description: "django-mub is a css and js collector and minifier"
+baseurl: "/django-mub"
+url: "http://brant.github.io"
+
+# custom stuff
+brant_homepage: "http://brantsteen.com"
+on_github: "http://github.com/Brant/django-mub"
+
+# Build settings
+markdown: kramdown
+permalink: pretty
+
+
