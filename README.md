@@ -8,6 +8,7 @@ Monster Under the Bed (django-mub) is a static-files (css &amp; js) collector an
 <ol>
 
 <li><strong>Install with pip (currently only available from github repository):</strong>
+
 ```
 pip install git+https://github.com/Brant/django-noodles.git@master
 ```
@@ -23,6 +24,7 @@ git+https://github.com/Brant/django-noodles.git@master
 </li>
 
 <li><strong>Add 'mub' to your INSTALLED_APPS setting:</strong>
+
 ```python
 INSTALLED_APPS = (
     ...
@@ -30,6 +32,7 @@ INSTALLED_APPS = (
     ...
 )
 ```
+
 <br />
 </li>
 
@@ -40,6 +43,7 @@ INSTALLED_APPS = (
 <html>{{ "{% load mub_tags " }}%}
 ...
 ```
+
 <br/>
 And use the 'add_static' tags provided by the mub_tags library:
 
@@ -53,6 +57,7 @@ And use the 'add_static' tags provided by the mub_tags library:
 	{{"{% add_static 'js'" }}%}
 </body>
 ```
+
 </li>
 
 </ol>
