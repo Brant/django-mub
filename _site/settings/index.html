@@ -40,6 +40,11 @@
       <div class="trigger">
         
         	
+          	<a class="page-link" href="/django-mub/caching/">Caching</a>
+          
+
+        
+        	
 
         
         	
@@ -64,7 +69,42 @@
   </header>
 
   <article class="post-content">
-  
+  <p>There are a handful of configurable settings for django-mub.</p>
+
+<p>For additional options and information when deploying to production, see the <a href="/django-mub/caching/">caching documentation</a>.</p>
+
+<h2 id="ordering-your-css-files">Ordering your CSS files</h2>
+
+<p>It’s often important to be able to specifically order your CSS files. For example, you often want your media queries to come toward the end of a compiled sheet, while items such as css resets appear at the top.</p>
+
+<p><strong>MUB_CSS_ORDER</strong>: Defaults to <code>((), ())</code></p>
+
+<p><em>Example:</em></p>
+
+<div class="highlight"><pre><code class="python"><span class="c"># settings.py</span>
+<span class="n">MUB_CSS_ORDER</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span><span class="s">&#39;reset.css&#39;</span><span class="p">,</span> <span class="s">&#39;base.css&#39;</span><span class="p">,</span> <span class="s">&#39;main.css&#39;</span><span class="p">),</span> <span class="c"># top of sheet</span>
+    <span class="p">(</span><span class="s">&#39;large-screens.css&#39;</span><span class="p">,</span> <span class="s">&#39;print.css&#39;</span><span class="p">)</span> <span class="c"># bottom of sheet</span>
+<span class="p">)</span></code></pre></div>
+
+<p>MUB_CSS_ORDER is a 2-tuple of tuples. The first set of items will appear at the top of the CSS sheet after it has been compiled and minified. The second set of items will appear at the bottom of that sheet. </p>
+
+<p>This allows you some fine-grained control over ordering your CSS (often important for specificity) when necessary without needing to specify the order of every individual sheet when it doesn’t really matter.</p>
+
+<h2 id="manually-choosing-to-compileminify-or-not">Manually choosing to compile/minify (or not)</h2>
+<p>You can choose whether or not to compile and minify your static files or if you’d prefer for the files to be listed individually.</p>
+
+<p><strong>MUB_MINIFY</strong>: Defaults to the oposite of your <code>DEBUG</code> setting</p>
+
+<p><em>Example:</em></p>
+
+<div class="highlight"><pre><code class="python"><span class="c"># settings.py</span>
+<span class="n">MUB_MINIFY</span> <span class="o">=</span> <span class="bp">True</span> <span class="c"># this will force mub to always compile/minify</span></code></pre></div>
+
+<p>Presumably you develop with <code>DEBUG = True</code>, changing it to <code>False</code> when deployed to production. The default setting will then leave your CSS and JS as individual files during development and compile/minify them in production.</p>
+
+<p>Regardless of whether you use minification or not, the order of the files will be consistent.</p>
+
 
   </article>
 
