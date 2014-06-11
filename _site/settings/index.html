@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Monster Under the Bed | Monster Under the Bed</title>
+    <title>Settings | Monster Under the Bed</title>
     <meta name="viewport" content="width=device-width">
     <meta name="description" content="django-mub is a css and js collector and minifier">
-    <link rel="canonical" href="http://brant.github.io/django-mub/">
+    <link rel="canonical" href="http://brant.github.io/django-mub/settings/">
     <link rel="shortcut icon" href="/django-mub/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/django-mub/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="/django-mub/apple-touch-icon-precomposed.png">
@@ -17,7 +17,7 @@
 </head>
 
 
-    <body class="home">
+    <body class="">
 
     <header class="site-header">
 
@@ -60,67 +60,11 @@
       <main class="post">
 
   <header class="post-header">
-    <h1>Monster Under the Bed</h1>
+    <h1>Settings</h1>
   </header>
 
   <article class="post-content">
-  <p>Monster Under the Bed (django-mub) is a static-files (css &amp; js) collector and minifier.</p>
-
-<h2 id="quickstart">Quickstart</h2>
-
-<ol>
-
-<li><strong>Install with pip (currently only available from github repository):</strong>
-
-<div class="highlight"><pre><code class="bash">pip install git+https://github.com/Brant/django-noodles.git@master</code></pre></div>
-
-
-<br />
-Or add it to your requirements.txt file:
-
-
-<div class="highlight"><pre><code class="bash"><span class="c"># requirements.txt</span>
-git+https://github.com/Brant/django-noodles.git@master</code></pre></div>
-
-<br />
-</li>
-
-<li><strong>Add 'mub' to your INSTALLED_APPS setting:</strong>
-
-<div class="highlight"><pre><code class="python"><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="o">...</span>
-    <span class="s">&#39;mub&#39;</span><span class="p">,</span>
-    <span class="o">...</span>
-<span class="p">)</span></code></pre></div>
-
-<br />
-</li>
-
-<li><strong>Load the 'mub_tags' templatetags in your template:</strong>
-
-
-<div class="highlight"><pre><code class="html"><span class="cp">&lt;!doctype html&gt;</span>
-<span class="nt">&lt;html&gt;</span>{% load mub_tags %}
-...</code></pre></div>
-
-<br />
-And use the 'add_static' tags provided by the mub_tags library:
-
-
-<div class="highlight"><pre><code class="html"><span class="nt">&lt;head&gt;</span>
-	...
-	{% add_static &#39;css&#39;%}
-<span class="nt">&lt;/head&gt;</span>
-<span class="nt">&lt;body&gt;</span>
-	...
-	{% add_static &#39;js&#39;%}
-<span class="nt">&lt;/body&gt;</span></code></pre></div>
-
-</li>
-
-</ol>
-
-<p>To review configurable options, see the <a href="/django-mub/settings/">settings documentation</a></p>
+  
 
   </article>
 
