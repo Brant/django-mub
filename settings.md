@@ -37,7 +37,7 @@ You can choose whether or not to compile and minify your static files or if you'
 MUB_MINIFY = True # this will force mub to always compile/minify
 {% endhighlight %}
 
-Presumably you develop with ```DEBUG = True```, changing it to ```True``` when deployed to production. The default setting will then leave your CSS and JS as individual files during development and compile/minify them in production.
+Presumably you develop with ```DEBUG = False```, changing it to ```True``` when deployed to production. The default setting will then leave your CSS and JS as individual files during development and compile/minify them in production.
 
 Regardless of whether you use minification or not, the order of the files will be consistent.
 
