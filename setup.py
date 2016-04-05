@@ -15,7 +15,7 @@ setup(
     include_package_data = True,
     zip_safe = False,
 
-    install_requires = ['setuptools', 'django'],
+    install_requires = ['setuptools', 'django', 'jsmin<2.3', 'cssmin<0.3'],
 
     classifiers = [
         'Development Status :: 3 - Alpha',
