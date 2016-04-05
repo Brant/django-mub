@@ -12,7 +12,7 @@ Monster Under the Bed (django-mub) is a static-files (css &amp; js) collector an
 
 <li><strong>Install with pip (currently only available from github repository):</strong>
 {% highlight bash %}
-pip install git+https://github.com/Brant/django-noodles.git@master
+pip install git+https://github.com/Brant/django-mub.git@master
 {% endhighlight %}
 
 <br/>
@@ -20,7 +20,7 @@ Or add it to your requirements.txt file:
 
 {% highlight bash %}
 # requirements.txt
-git+https://github.com/Brant/django-noodles.git@master
+git+https://github.com/Brant/django-mub.git@master
 {% endhighlight %}
 <br/>
 </li>
