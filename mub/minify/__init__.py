@@ -9,8 +9,8 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.encoding import smart_unicode
 
-from .css_min import cssmin
-from .js_min import jsmin
+from cssmin import cssmin
+from jsmin import jsmin
 from mub.util import massage_css_images_for_cache_path
 
 class MUBMinifier:
