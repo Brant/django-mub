@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os
 import sys
-import imp
 
 import django
 from django.conf import settings
@@ -17,23 +16,8 @@ MY_INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-
-try:
-    imp.find_module("django_nose")
-    MY_INSTALLED_APPS.append("django_nose")
-except ImportError:
-    pass
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BASE_DIR)
-MY_TEST_RUNNER = 'django.test.runner.DiscoverRunner'
-
-try:
-    from django_nose.runner import NoseTestSuiteRunner
-    MY_TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-except ImportError:
-    pass
-
 
 if not settings.configured:
     settings.configure(
@@ -52,19 +36,7 @@ if not settings.configured:
         STATIC_URL = '/static/',
         STATIC_ROOT = PROJECT_PATH + "/collectstatic",
         ROOT_URLCONF = 'mub_tests.urls',
-        NOSE_ARGS = [
-            "--with-xcoverage",
-            "--cover-inclusive",
-            "--with-xunit",
-            "--exe",
-            "--verbosity=3",
-            "--cover-package=mub"
-        ],
-        NOSE_PLUGINS = [
-            'nosexcover.XCoverage',
-            "nose_exclude.NoseExclude"
-        ],
-        TEST_RUNNER = MY_TEST_RUNNER,
+        TEST_RUNNER = 'django.test.runner.DiscoverRunner',
     )
 
 
