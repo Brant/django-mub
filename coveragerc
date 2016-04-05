@@ -4,11 +4,13 @@ branch = True
 
 omit =
 	*/.env/*
+	*/env/*
 	*/settings*
 	*/tests*
 	*/manage.py
 	*/migrations/*
 	*/__init__.py
+
 
 [report]
 # Regexes for lines to exclude from consideration
