@@ -5,6 +5,7 @@ branch = True
 omit =
 	*/.env/*
 	*/env/*
+	*/virtualenv/*
 	*/settings*
 	*/tests*
 	*/manage.py
