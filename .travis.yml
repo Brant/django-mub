@@ -9,6 +9,6 @@ env:
 install:
     - pip install $DJANGO
     - pip install -r mub_tests/requirements.txt
-script: coverage run --rcfile=coveragerc mub_tests/runtests.py 
+script: coverage run --rcfile=.coveragerc mub_tests/runtests.py 
 sudo: false
 after_success: coveralls
